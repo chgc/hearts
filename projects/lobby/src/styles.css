@@ -1,28 +1,42 @@
 /* You can add global styles to this file, and also import other style files */
 
-div {
-  margin-right: 5px;
+.player1 {
+  background-color: beige;
+  height: 100px;
+  margin-bottom: 25px;
 }
 
-.card {
-  width: 71px;
-  height: 97px;
-  display: inline-block;
+.player2 {
+  background-color: burlywood;
+  height: 100px;
+  margin-bottom: 25px;
+}
+
+.player3 {
+  background-color: darkgreen;
+  height: 100px;
+  margin-bottom: 25px;
+}
+
+.player4 {
+  background-color: lightgreen;
+  height: 100px;
+  margin-bottom: 25px;
+}
+
+app-card {
   background: url('./assets/cards.png');
 }
 
 .clubs {
   background-position-y: -2px;
 }
-
 .hearts {
   background-position-y: -100px;
 }
-
 .spades {
   background-position-y: -198px;
 }
-
 .diamonds {
   background-position-y: -296px;
 }
@@ -30,11 +44,9 @@ div {
 .one {
   background-position-x: -2px;
 }
-
 .two {
   background-position-x: -75px;
 }
-
 .three {
   background-position-x: -148px;
 }
