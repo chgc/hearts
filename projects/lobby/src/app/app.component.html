@@ -1,5 +1,22 @@
-<div *ngFor="let playerCards of players;let idx = index" class="player{{idx+1}}">
-  <app-card *ngFor="let card of playerCards" [ngClass]="[card.face, card.number]"></app-card>
-</div>
-
+<app-player
+  *ngFor="let playerCards of players; let idx = index"
+  class="player{{ idx + 1 }}"
+  [cards]="playerCards"
+  (pickCard)="sendToPool($event)"
+  [canPick]="condition(idx)"
+>
+</app-player>
+<hr />
+<h2>Pool</h2>
+<app-card
+  *ngFor="let card of pool"
+  [ngClass]="[card.face, card.number]"
+></app-card>
+<hr />
+<h2>Deck</h2>
+<app-card
+  *ngFor="let card of cards"
+  [ngClass]="[card.face, card.number]"
+></app-card>
+<br />
 <button (click)="newGame()">new deck</button>

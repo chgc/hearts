@@ -1,21 +1,6 @@
 import { Component } from '@angular/core';
+import { CardGameFactoryService } from './services/dealer.service';
 
-const FACES = ['clubs', 'hearts', 'spades', 'diamonds'];
-const CARD_NUM = [
-  'one',
-  'two',
-  'three',
-  'four',
-  'five',
-  'six',
-  'seven',
-  'eight',
-  'nine',
-  'ten',
-  'jack',
-  'queen',
-  'king'
-];
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -25,37 +10,30 @@ export class AppComponent {
   title = 'lobby';
   cards = [];
   players = [[], [], [], []];
+  pool = [];
+  currentTurn = 0;
 
-  constructor() {
+  constructor(private dealer: CardGameFactoryService) {
     this.newGame();
   }
 
-  newpack() {
-    this.cards = [];
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 13; j++) {
-        this.cards.push({ face: FACES[i], number: CARD_NUM[j] });
-      }
-    }
-  }
-
-  shuffle() {
-    this.cards.sort(() => Math.random() - 0.5);
-  }
-
-  deal() {
-    this.players = this.cards.reduce(
-      (players, card, index) => {
-        players[index % 4].push(card);
-        return players;
-      },
-      [[], [], [], []]
-    );
+  condition(idx) {
+    return function() {
+      return this.currentTurn % this.players.length === idx;
+    }.bind(this);
   }
 
   newGame() {
-    this.newpack();
-    this.shuffle();
-    this.deal();
+    this.pool = [];
+    const game = this.dealer.newGame({
+      numOfPlayer: 4
+    });
+    this.players = game.players;
+    this.cards = game.deck;
+  }
+
+  sendToPool(card) {
+    this.pool.push(card);
+    this.currentTurn += 1;
   }
 }
