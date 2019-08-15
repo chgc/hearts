@@ -1,19 +1,27 @@
-import { Subject, BehaviorSubject, merge, of } from 'rxjs';
-import { scan, tap, filter, shareReplay, map, mergeMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { filter, map, mergeMap, scan, shareReplay, tap } from 'rxjs/operators';
+import { Card } from './dealer.service';
 import { Player } from './player';
 export class Game {
   players = [];
   deck = [];
+  pools = [];
   currentTurn = 0;
 
   pool$ = new BehaviorSubject([]);
-  newRound = new Subject<boolean>();
 
-  pool = merge(this.pool$, this.newRound).pipe(
+  process = tap((deck: Card[]) => {
+    if (deck.length === 4) {
+      this.pool$.next([]);
+    }
+  });
+
+  gameHandler$ = this.pool$.asObservable().pipe(
     filter(v => v !== null),
-    scan<any[]>((acc, value: any[] | boolean) => {
-      return typeof value === 'boolean' ? [] : [...acc, ...value];
+    scan((acc, value) => {
+      return value.length === 0 ? [] : [...acc, ...value];
     }, []),
+    this.process,
     tap(v => console.log(v)),
     shareReplay()
   );
@@ -23,9 +31,14 @@ export class Game {
       ({ initDeck, players, pools }) => {
         this.deck = initDeck;
         this.players = players;
+        this.pools = pools;
         this.currentTurn = pools.length;
       }
     );
+  }
+
+  get currentPlayer() {
+    return this.players[this.currentTurn % this.numOfPlayer];
   }
 
   initGame(startCardsPerPlayer, deck) {
@@ -33,7 +46,7 @@ export class Game {
       map(this.shuffle),
       map(shuffedDeck => this.set(startCardsPerPlayer, shuffedDeck)),
       mergeMap(({ initDeck, players }) =>
-        this.pool.pipe(map(pools => ({ initDeck, players, pools })))
+        this.gameHandler$.pipe(map(pools => ({ initDeck, players, pools })))
       )
     );
   }
@@ -43,7 +56,8 @@ export class Game {
   }
 
   condition(idx) {
-    return () => this.currentTurn % this.players.length === idx;
+    const rules = [];
+    return () => rules.every(x => x);
   }
 
   private set(startCardsPerPlayer, initDeck) {
