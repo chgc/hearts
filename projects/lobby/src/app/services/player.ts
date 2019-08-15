@@ -1,7 +1,11 @@
-import { Card } from './dealer.service';
+import { Rule, Card } from './game-rule';
 
 export class Player {
   cards: Card[] = [];
+  winDeck = [];
+
+  score = 0;
+  constructor(private rule: Rule) {}
 
   take(card) {
     this.cards.push(card);

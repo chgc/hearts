@@ -1,9 +1,10 @@
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { filter, map, mergeMap, scan, shareReplay, tap } from 'rxjs/operators';
-import { Card } from './dealer.service';
 import { Player } from './player';
+import { Rule, CARD_SCORE, Card } from './game-rule';
+
 export class Game {
-  players = [];
+  players: Player[] = [];
   deck = [];
   pools: Card[] = [];
   currentTurn = 0;
@@ -12,15 +13,24 @@ export class Game {
 
   process = tap((deck: Card[]) => {
     if (deck.length === 4) {
+      const xdeck = deck
+        .filter(x => x.face === deck[0].face)
+        .map(x => (x.value === 0 ? 14 : x.value));
+
+      const largestNum = Math.max(...xdeck);
+      const winner = deck.findIndex(
+        x =>
+          x.face === deck[0].face &&
+          x.value === (largestNum === 14 ? 0 : largestNum)
+      );
+      this.players[winner].winDeck.push(deck);
       this.pool$.next([]);
     }
   });
 
   gameHandler$ = this.pool$.asObservable().pipe(
     filter(v => v !== null),
-    scan((acc, value) => {
-      return value.length === 0 ? [] : [...acc, ...value];
-    }, []),
+    scan((acc, value) => (value.length === 0 ? [] : [...acc, ...value]), []),
     this.process,
     tap(v => console.log(v)),
     shareReplay()
@@ -68,10 +78,17 @@ export class Game {
     return rules.every(x => x);
   }
 
+  private gameRule(): Rule {
+    return {
+      cardPoint: CARD_SCORE,
+      specialRule: {}
+    };
+  }
+
   private set(startCardsPerPlayer, initDeck) {
     const players: Player[] = Array.from(
       Array(this.numOfPlayer),
-      () => new Player()
+      () => new Player(this.gameRule())
     );
     const maxCardCount = Math.min(this.numOfPlayer * startCardsPerPlayer, 52);
     for (let i = 0; i < maxCardCount; i++) {
