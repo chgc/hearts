@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Game } from './game';
 
+export interface Card {
+  face: string;
+  number: string;
+  value: number;
+}
 const FACES = ['clubs', 'hearts', 'spades', 'diamonds'];
 const CARD_NUM = [
   'one',

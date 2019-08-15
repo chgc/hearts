@@ -1,5 +1,6 @@
 import { Subject, BehaviorSubject, merge, of } from 'rxjs';
 import { scan, tap, filter, shareReplay, map, mergeMap } from 'rxjs/operators';
+import { Player } from './player';
 export class Game {
   players = [];
   deck = [];
@@ -46,11 +47,15 @@ export class Game {
   }
 
   private set(startCardsPerPlayer, initDeck) {
-    const players = Array.from(Array(this.numOfPlayer), () => []);
+    const players: Player[] = Array.from(
+      Array(this.numOfPlayer),
+      () => new Player()
+    );
     const maxCardCount = Math.min(this.numOfPlayer * startCardsPerPlayer, 52);
     for (let i = 0; i < maxCardCount; i++) {
-      players[i % this.numOfPlayer].push(initDeck.shift());
+      players[i % this.numOfPlayer].take(initDeck.shift());
     }
+    players.forEach(player => player.sort());
     return { initDeck, players };
   }
 
