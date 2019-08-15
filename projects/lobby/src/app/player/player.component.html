@@ -1,2 +1,2 @@
-<app-card *ngFor="let card of player.cards;let idx=index" [card]="card" (dblclick)="play(idx)">
+<app-card *ngFor="let card of player.cards" [card]="card" (dblclick)="play(card)">
 </app-card>

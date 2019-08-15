@@ -11,11 +11,11 @@ export class PlayerComponent {
   @Input() player: Player;
   @Input() game: Game;
 
-  play(idx) {
-    if (this.player !== this.game.currentPlayer) {
+  play(card) {
+    if (!this.game.legalPlay(this.player, card)) {
       return;
     }
-    const card = this.player.cards.splice(idx, 1)[0];
+    this.player.cards = this.player.cards.filter(x => x !== card);
     this.game.play(card);
   }
 }

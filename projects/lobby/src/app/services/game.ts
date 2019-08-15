@@ -5,7 +5,7 @@ import { Player } from './player';
 export class Game {
   players = [];
   deck = [];
-  pools = [];
+  pools: Card[] = [];
   currentTurn = 0;
 
   pool$ = new BehaviorSubject([]);
@@ -55,9 +55,17 @@ export class Game {
     this.pool$.next(card);
   }
 
-  condition(idx) {
-    const rules = [];
-    return () => rules.every(x => x);
+  legalPlay(player: Player, card: Card) {
+    const rule1 = this.currentPlayer === player;
+    const rule2 = [
+      this.pools.length === 0,
+      this.pools.length > 0 &&
+        (this.pools[0].face === card.face ||
+          player.cards.findIndex(x => x.face === this.pools[0].face) === -1)
+    ].some(x => x);
+
+    const rules = [rule1, rule2];
+    return rules.every(x => x);
   }
 
   private set(startCardsPerPlayer, initDeck) {
