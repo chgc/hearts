@@ -1,20 +1,58 @@
+import { Subject, BehaviorSubject, merge, of } from 'rxjs';
+import { scan, tap, filter, shareReplay, map, mergeMap } from 'rxjs/operators';
 export class Game {
   players = [];
+  deck = [];
+  currentTurn = 0;
 
-  constructor(private numOfPlayer, startCardsPerPlayer, public deck) {
-    this.deck = this.shuffle(deck);
-    this.set(startCardsPerPlayer);
+  pool$ = new BehaviorSubject([]);
+  newRound = new Subject<boolean>();
+
+  pool = merge(this.pool$, this.newRound).pipe(
+    filter(v => v !== null),
+    scan<any[]>((acc, value: any[] | boolean) => {
+      return typeof value === 'boolean' ? [] : [...acc, ...value];
+    }, []),
+    tap(v => console.log(v)),
+    shareReplay()
+  );
+
+  constructor(private numOfPlayer, startCardsPerPlayer, deck) {
+    this.initGame(startCardsPerPlayer, deck).subscribe(
+      ({ initDeck, players, pools }) => {
+        this.deck = initDeck;
+        this.players = players;
+        this.currentTurn = pools.length;
+      }
+    );
   }
 
-  private set(startCardsPerPlayer) {
-    this.players = Array.from(Array(this.numOfPlayer), () => []);
+  initGame(startCardsPerPlayer, deck) {
+    return of(deck).pipe(
+      map(this.shuffle),
+      map(shuffedDeck => this.set(startCardsPerPlayer, shuffedDeck)),
+      mergeMap(({ initDeck, players }) =>
+        this.pool.pipe(map(pools => ({ initDeck, players, pools })))
+      )
+    );
+  }
+
+  play(...card) {
+    this.pool$.next(card);
+  }
+
+  condition(idx) {
+    return () => this.currentTurn % this.players.length === idx;
+  }
+
+  private set(startCardsPerPlayer, initDeck) {
+    const players = Array.from(Array(this.numOfPlayer), () => []);
     const maxCardCount = Math.min(this.numOfPlayer * startCardsPerPlayer, 52);
     for (let i = 0; i < maxCardCount; i++) {
-      this.players[i % this.numOfPlayer].push(this.deck.shift());
+      players[i % this.numOfPlayer].push(initDeck.shift());
     }
+    return { initDeck, players };
   }
-
-  playCard() {}
 
   private shuffle(deck) {
     return deck.slice().sort(() => Math.random() - 0.5);

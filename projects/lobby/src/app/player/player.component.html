@@ -1,5 +1,2 @@
-<app-card
-  *ngFor="let card of cards; let idx = index"
-  [ngClass]="[card.face, card.number]"
-  (dblclick)="pick(idx)"
-></app-card>
+<app-card *ngFor="let card of cards; let idx = index" [ngClass]="[card.face, card.number]"
+          (dblclick)="play(idx)"></app-card>

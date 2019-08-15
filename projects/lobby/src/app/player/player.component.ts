@@ -8,14 +8,13 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 export class PlayerComponent {
   @Input() cards = [];
   @Input() canPick: () => boolean;
-  @Output() pickCard = new EventEmitter<any>();
+  @Output() playCard = new EventEmitter<any>();
 
-  pick(idx) {
-    console.log(this.canPick());
+  play(idx) {
     if (!this.canPick()) {
       return;
     }
     const card = this.cards.splice(idx, 1)[0];
-    this.pickCard.emit(card);
+    this.playCard.emit(card);
   }
 }
