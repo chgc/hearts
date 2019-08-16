@@ -11,24 +11,24 @@ export interface Card {
 
 export const CARD_SCORE = {
   hearts: {
-    one: player => -50,
-    two: player => -2,
-    three: player => -3,
-    four: player => -10,
-    five: player => -5,
-    six: player => -6,
-    seven: player => -7,
-    eight: player => -8,
-    nine: player => -9,
-    ten: player => -10,
-    jack: player => -20,
-    queen: player => -30,
-    king: player => -40
+    one: -50,
+    two: -2,
+    three: -3,
+    four: -10,
+    five: -5,
+    six: -6,
+    seven: -7,
+    eight: -8,
+    nine: -9,
+    ten: -10,
+    jack: -20,
+    queen: -30,
+    king: -40
   },
   diamonds: {
-    jack: player => 100
+    jack: 100
   },
   spades: {
-    queen: player => -100
+    queen: -100
   }
 };

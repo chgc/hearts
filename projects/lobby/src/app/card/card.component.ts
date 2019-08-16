@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Card } from '../services/dealer.service';
+import { Card } from '../services/game-rule';
 
 @Component({
   selector: 'app-card',

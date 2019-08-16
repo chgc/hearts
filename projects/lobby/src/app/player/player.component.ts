@@ -15,7 +15,7 @@ export class PlayerComponent {
     if (!this.game.legalPlay(this.player, card)) {
       return;
     }
-    this.player.cards = this.player.cards.filter(x => x !== card);
+    this.player.cards = this.player.play(card);
     this.game.play(card);
   }
 }

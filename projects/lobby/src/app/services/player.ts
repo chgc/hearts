@@ -11,6 +11,20 @@ export class Player {
     this.cards.push(card);
   }
 
+  play(card) {
+    return this.cards.filter(x => x !== card);
+  }
+
+  win(deck: Card[]) {
+    deck.forEach(card => {
+      const face = this.rule.cardPoint[card.face];
+      if (face) {
+        this.score += face[card.number] || 0;
+      }
+    });
+    this.winDeck.push(deck);
+  }
+
   sort() {
     this.cards.sort((cardA, cardB) => {
       return cardA.face > cardB.face

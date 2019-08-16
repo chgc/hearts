@@ -8,6 +8,7 @@ export class Game {
   deck = [];
   pools: Card[] = [];
   currentTurn = 0;
+  lastWinner = 0;
 
   pool$ = new BehaviorSubject([]);
 
@@ -15,16 +16,27 @@ export class Game {
     if (deck.length === 4) {
       const xdeck = deck
         .filter(x => x.face === deck[0].face)
-        .map(x => (x.value === 0 ? 14 : x.value));
+        .map(x => (x.value === 1 ? 14 : x.value));
 
       const largestNum = Math.max(...xdeck);
-      const winner = deck.findIndex(
-        x =>
-          x.face === deck[0].face &&
-          x.value === (largestNum === 14 ? 0 : largestNum)
-      );
-      this.players[winner].winDeck.push(deck);
-      this.pool$.next([]);
+      this.lastWinner =
+        (deck.findIndex(
+          x =>
+            x.face === deck[0].face &&
+            x.value === (largestNum === 14 ? 1 : largestNum)
+        ) +
+          this.lastWinner) %
+        this.numOfPlayer;
+      this.players[this.lastWinner].win(deck);
+
+      setTimeout(() => {
+        this.pool$.next([]);
+      }, 500);
+    } else {
+      this.currentTurn =
+        deck.length === 0
+          ? this.lastWinner
+          : (this.currentTurn + 1) % this.numOfPlayer;
     }
   });
 
@@ -32,7 +44,6 @@ export class Game {
     filter(v => v !== null),
     scan((acc, value) => (value.length === 0 ? [] : [...acc, ...value]), []),
     this.process,
-    tap(v => console.log(v)),
     shareReplay()
   );
 
@@ -42,7 +53,6 @@ export class Game {
         this.deck = initDeck;
         this.players = players;
         this.pools = pools;
-        this.currentTurn = pools.length;
       }
     );
   }
