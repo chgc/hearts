@@ -32,3 +32,15 @@ export const CARD_SCORE = {
     queen: -100
   }
 };
+
+export const CARD_SPECIAL = {
+  diamonds: {
+    jack: true
+  },
+  spades: {
+    queen: true
+  },
+  clubs: {
+    ten: true
+  }
+};
